@@ -56,7 +56,7 @@ def main():
                 print('Termination protection disengaged - instance: ' + instance_id)
 
             except:
-                print('Problem processing message')
+                print('Problem processing message', sys.exc_info()[0])
 
 if __name__ == '__main__':
     main()
