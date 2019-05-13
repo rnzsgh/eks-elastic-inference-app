@@ -50,7 +50,7 @@ def main():
                 print('Message deleted - instance: ' + instance_id)
 
                 ec2_client.modify_instance_attribute(
-                    InstanceId=instance-id,
+                    InstanceId=instance_id,
                     DisableApiTermination={ 'Value': False },
                 )
                 print('Termination protection disengaged - instance: ' + instance_id)
