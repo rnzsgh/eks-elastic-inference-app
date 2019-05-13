@@ -33,7 +33,7 @@ def main():
         for message in task_queue.receive_messages(WaitTimeSeconds=20):
             try:
                 print('Message received - instance: ' + instance_id)
-                ec2_client.client.modify_instance_attribute(
+                ec2_client.modify_instance_attribute(
                     InstanceId=instance_id,
                     DisableApiTermination={ 'Value': True },
                 )
@@ -49,7 +49,7 @@ def main():
                 message.delete()
                 print('Message deleted - instance: ' + instance_id)
 
-                ec2_client.client.modify_instance_attribute(
+                ec2_client.modify_instance_attribute(
                     InstanceId=instance-id,
                     DisableApiTermination={ 'Value': False },
                 )
