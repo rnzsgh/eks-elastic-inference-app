@@ -8,7 +8,7 @@ def main():
 
     try:
         task_queue_name = os.environ['SQS_TASK_QUEUE']
-        task_competed_queue_name = os.environ['SQS_TASK_COMPLETED_QUEUE']
+        task_completed_queue_name = os.environ['SQS_TASK_COMPLETED_QUEUE']
     except KeyError:
         print('Please set the environment variables for SQS_TASK_QUEUE and SQS_TASK_COMPLETED_QUEUE')
         sys.exit(1)
@@ -25,7 +25,7 @@ def main():
     ec2_client = boto3.client('ec2', region_name=region)
 
     task_queue = boto3.resource('sqs', region_name=region).get_queue_by_name(QueueName=task_queue_name)
-    task_completed_queue = boto3.resource('sqs', region_name=region).get_queue_by_name(QueueName=task_competed_queue_name)
+    task_completed_queue = boto3.resource('sqs', region_name=region).get_queue_by_name(QueueName=task_completed_queue_name)
 
     while True:
         for message in task_queue.receive_messages(WaitTimeSeconds=20):
