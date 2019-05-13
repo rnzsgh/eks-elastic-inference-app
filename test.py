@@ -1,4 +1,5 @@
 import boto3, os, sys, requests
+from mpmath import mp
 
 
 def main():
@@ -43,6 +44,9 @@ def main():
                 print('Message visibility updated - instance: ' + instance_id)
 
                 # Process the message
+
+                mp.dps = 2000
+                print(mp.quad(lambda x: mp.exp(-x**2), [-mp.inf, mp.inf]) ** 2)
 
                 task_completed_queue.send_message(MessageBody='completed')
                 print('Task completed msg sent - instance: ' + instance_id)
