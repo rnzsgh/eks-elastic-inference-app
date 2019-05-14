@@ -1,4 +1,4 @@
 
 boto3==1.9.146
 requests==2.21.0
-mpmath=1.0.0
+mpmath==1.0.0
