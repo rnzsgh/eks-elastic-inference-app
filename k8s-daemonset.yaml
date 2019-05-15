@@ -55,7 +55,7 @@ spec:
         nodegroup: elastic-inference
       containers:
       - name: inference-daemon
-        image: rnzdocker1/eks-elastic-inference-app:65f0ee02bd1b06fde2fe55d3c7eeae2202d9fa31
+        image: rnzdocker1/eks-elastic-inference-app:bfd1098024c348ebd0e2615d2e26d8c2edefcebf
         imagePullPolicy: Always
         env:
         - name: SQS_TASK_QUEUE
