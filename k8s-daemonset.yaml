@@ -59,9 +59,9 @@ spec:
         imagePullPolicy: Always
         env:
         - name: SQS_TASK_QUEUE
-          value: task-queue-eks-a
+          value: task-queue-eks-0
         - name: SQS_TASK_COMPLETED_QUEUE
-          value: task-completed-queue-eks-a
+          value: task-completed-queue-eks-0
         resources:
           limits:
             memory: 3584Mi
