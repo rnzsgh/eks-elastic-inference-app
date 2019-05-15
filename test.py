@@ -14,9 +14,6 @@ def main():
         print('Please set the environment variables for SQS_TASK_QUEUE and SQS_TASK_COMPLETED_QUEUE')
         sys.exit(1)
 
-    #print(task_queue_name)
-    #print(task_completed_queue_name)
-
     # Get the instance information
     r = requests.get("http://169.254.169.254/latest/dynamic/instance-identity/document")
     r.raise_for_status()
@@ -45,7 +42,7 @@ def main():
 
                 # Process the message
 
-                mp.dps = 1000
+                mp.dps = 500
                 print(mp.quad(lambda x: mp.exp(-x**2), [-mp.inf, mp.inf]) ** 2)
 
                 task_completed_queue.send_message(MessageBody='completed')
