@@ -45,7 +45,7 @@ def main():
 
                 # Process the message
 
-                mp.dps = 1000
+                mp.dps = 200
                 print(mp.quad(lambda x: mp.exp(-x**2), [-mp.inf, mp.inf]) ** 2)
 
                 task_completed_queue.send_message(MessageBody='completed')
