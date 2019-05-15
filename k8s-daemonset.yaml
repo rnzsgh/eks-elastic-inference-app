@@ -55,13 +55,13 @@ spec:
         nodegroup: elastic-inference
       containers:
       - name: inference-daemon
-        image: rnzdocker1/eks-elastic-inference-app:bfd1098024c348ebd0e2615d2e26d8c2edefcebf
+        image: rnzdocker1/eks-elastic-inference-app:5f48aa0ce00c567ee06a880e6479b2f3491fff47
         imagePullPolicy: Always
         env:
         - name: SQS_TASK_QUEUE
-          value: task-queue-eks-0
+          value: task-queue-eks-a
         - name: SQS_TASK_COMPLETED_QUEUE
-          value: task-completed-queue-eks-0
+          value: task-completed-queue-eks-a
         resources:
           limits:
             memory: 3584Mi
