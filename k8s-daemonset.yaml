@@ -71,7 +71,7 @@ spec:
         image: rnzdocker1/eks-elastic-inference-serving:189cd7b89fc36d1b9f9f3bc5b6130b3ab855a554
         imagePullPolicy: Always
         ports:
-          - name: tensorflow-serving-rest-api
+          - name: tf-serving-api
             containerPort: 8501
             hostPort: 8501
             protocol: TCP
