@@ -55,7 +55,7 @@ spec:
         nodegroup: elastic-inference
       containers:
       - name: inference-daemon
-        image: rnzdocker1/eks-elastic-inference-app:d5b5ec90eaa27c87dcb036b89ad8c2130a1812e9
+        image: rnzdocker1/eks-elastic-inference-app:189cd7b89fc36d1b9f9f3bc5b6130b3ab855a554
         imagePullPolicy: Always
         env:
         - name: SQS_TASK_QUEUE
@@ -64,10 +64,23 @@ spec:
           value: task-completed-queue-eks-0
         resources:
           limits:
-            memory: 3584Mi
-            cpu: 2
+            memory: 512Mi
           requests:
-            memory: 3584Mi
+            memory: 512Mi
+      - name: tensorflow-serving
+        image: rnzdocker1/eks-elastic-inference-serving:189cd7b89fc36d1b9f9f3bc5b6130b3ab855a554
+        imagePullPolicy: Always
+        ports:
+          - name: tensorflow-serving-rest-api
+            containerPort: 8501
+            hostPort: 8501
+            protocol: TCP
+        resources:
+          limits:
+            memory: 3072Mi
+            cpu: 1.75
+          requests:
+            memory: 3072Mi
             cpu: 1.75
         volumeMounts:
         - name: config-volume
