@@ -64,9 +64,11 @@ spec:
           value: task-completed-queue-eks-0
         resources:
           limits:
-            memory: 512Mi
+            memory: 1024Mi
+            cpu: 250m
           requests:
-            memory: 512Mi
+            memory: 1024Mi
+            cpu: 250m
       - name: tensorflow-serving
         image: rnzdocker1/eks-elastic-inference-serving:189cd7b89fc36d1b9f9f3bc5b6130b3ab855a554
         imagePullPolicy: Always
@@ -77,11 +79,11 @@ spec:
             protocol: TCP
         resources:
           limits:
-            memory: 3072Mi
-            cpu: 1.75
+            memory: 2048Mi
+            cpu: 1500m
           requests:
-            memory: 3072Mi
-            cpu: 1.75
+            memory: 2048Mi
+            cpu: 1500m
         volumeMounts:
         - name: config-volume
           mountPath: /app/ei
