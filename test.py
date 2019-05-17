@@ -6,6 +6,8 @@ import numpy
 import requests
 import json
 import logging
+import threading
+import queue
 
 import coco_label_map
 
@@ -21,6 +23,8 @@ logging.basicConfig(
 )
 
 log = logging.getLogger()
+
+
 
 def get_predictions_from_image_array(batch):
     log.info('get_predictions_from_image_array')
@@ -46,9 +50,15 @@ def get_classes_with_scores(predictions):
 
     return vals
 
+def prepare_frames(q, ):
+
+
+
 def process_video_from_file(file_path):
 
     log.info('process_video_from_file')
+
+    q = queue.Queue(maxsize=FRAME_BATCH)
 
     frames = []
     vidcap = cv2.VideoCapture(file_path)
@@ -58,7 +68,7 @@ def process_video_from_file(file_path):
     log.info('start frame extraction')
 
     while success:
-        frames.append(frame.tolist())
+        frames.append(frame)
         success, frame = vidcap.read()
 
     log.info('end frame extraction')
@@ -82,7 +92,7 @@ def process_video_from_file(file_path):
                 predictions.append('\n')
             batch.clear()
         else:
-            batch.append(frames[i])
+            batch.append(frames[i].tolist())
 
     vidcap.release()
     cv2.destroyAllWindows()
