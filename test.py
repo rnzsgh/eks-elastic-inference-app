@@ -50,9 +50,10 @@ def process_video_from_file(file_path, instance_id):
     while success:
         if count % 100 == 0:
             log.info('frame: %d', count)
+
         count += 1
-      frames.append(frame)
-      success, frame = vidcap.read()
+        frames.append(frame)
+        success, frame = vidcap.read()
 
     log.info('processing video second loop - instance: %s', instance_id)
     pred_list = []
