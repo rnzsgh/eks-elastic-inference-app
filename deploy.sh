@@ -6,6 +6,8 @@ echo EI APP --------------------------------------------------------------------
 
 APP_REPOSITORY=rnzdocker1/eks-elastic-inference-app
 
+python -m py_compile test.py
+
 docker build --tag $APP_REPOSITORY:$TAG .
 
 docker push $APP_REPOSITORY:$TAG
