@@ -5,11 +5,20 @@ import cv2
 import numpy
 import requests
 import json
+import logging
 
 import coco_label_map
 
 ENDPOINT = 'http://localhost:8501/v1/models/default:predict'
 TMP_FILE = './tmp.mov'
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s',
+    handlers=[ logging.StreamHandler(sys.stdout) ],
+)
+
+log = logging.getLogger()
 
 def get_prediction_from_image_array(image_array):
     payload = {"instances": [image_array.tolist()]}
@@ -50,7 +59,7 @@ def main():
         task_queue_name = os.environ['SQS_TASK_QUEUE']
         task_completed_queue_name = os.environ['SQS_TASK_COMPLETED_QUEUE']
     except KeyError:
-        print('Please set the environment variables for SQS_TASK_QUEUE and SQS_TASK_COMPLETED_QUEUE')
+        log.error('Please set the environment variables for SQS_TASK_QUEUE and SQS_TASK_COMPLETED_QUEUE')
         sys.exit(1)
 
     # Get the instance information
@@ -66,48 +75,51 @@ def main():
     task_queue = boto3.resource('sqs', region_name=region).get_queue_by_name(QueueName=task_queue_name)
     task_completed_queue = boto3.resource('sqs', region_name=region).get_queue_by_name(QueueName=task_completed_queue_name)
 
-    print('Instance initialized: ' + instance_id)
+    log.info('Initialized - instance: %s', instance_id)
 
     while True:
         for message in task_queue.receive_messages(WaitTimeSeconds=20):
             try:
-                print('Message received - instance: ' + instance_id)
+                log.info('Message received - instance: %s', instance_id)
 
                 ec2.modify_instance_attribute(
                     InstanceId=instance_id,
                     DisableApiTermination={ 'Value': True },
                 )
-                print('Termination protection engaged - instance: ' + instance_id)
+                log.info('Termination protection engaged - instance: %s', instance_id)
 
                 message.change_visibility(VisibilityTimeout=600)
-                print('Message visibility updated - instance: ' + instance_id)
+                log.info('Message visibility updated - instance: %s', instance_id)
+
+                log.info(message.body)
 
                 # Process the message
                 doc = json.loads(message.body)
                 print('Message body is loaded - instance: ' + instance_id)
 
                 s3.download_file(doc['bucket'], doc['object'], TMP_FILE)
-                print('File is downloaded - instance: ' + instance_id)
+                log.info('File is downloaded - instance: %s', instance_id)
 
                 predictions_for_frames = process_video_from_file(TMP_FILE)
-                print('Predictions completed - instance: ' + instance_id)
+                log.info('Predictions completed - instance: %s', instance_id)
 
                 task_completed_queue.send_message(MessageBody=''.join(e for e in predictions_for_frames))
-                print('Task completed msg sent - instance: ' + instance_id)
+                log.info('Task completed msg sent - instance: %s', instance_id)
                 message.delete()
-                print('Message deleted - instance: ' + instance_id)
+                log.info('Message deleted - instance: %s', instance_id)
 
                 ec2.modify_instance_attribute(
                     InstanceId=instance_id,
                     DisableApiTermination={ 'Value': False },
                 )
-                print('Termination protection disengaged - instance: ' + instance_id)
+                log.info('Termination protection disengaged - instance: %s', instance_id)
 
                 if os.path.exists(TMP_FILE):
                     os.remove(TMP_FILE)
 
             except:
-                print('Problem processing message: ', sys.exc_info()[0])
+                log.error('Problem processing message: %s - instance: %s', sys.exc_info()[0], instance_id)
 
 if __name__ == '__main__':
     main()
+
