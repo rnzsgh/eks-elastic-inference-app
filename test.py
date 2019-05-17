@@ -58,7 +58,7 @@ def process_video_from_file(file_path):
     log.info('start frame extraction')
 
     while success:
-        frames.append(frame)
+        frames.append(frame.tolist())
         success, frame = vidcap.read()
 
     log.info('end frame extraction')
@@ -72,8 +72,7 @@ def process_video_from_file(file_path):
     log.info('frame batch %d', FRAME_BATCH)
 
     for i in range(count):
-        log.info('range: %d', i)
-        log.info('batch size: %d', len(batch))
+        log.info('range: %d - batch: %d', i, len(batch))
         if len(batch) == FRAME_BATCH or i == (count - 1):
             log.info('start batch process')
 
@@ -83,7 +82,7 @@ def process_video_from_file(file_path):
                 predictions.append('\n')
             batch.clear()
         else:
-            batch.append(frames[i].tolist())
+            batch.append(frames[i])
 
     vidcap.release()
     cv2.destroyAllWindows()
