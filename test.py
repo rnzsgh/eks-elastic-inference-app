@@ -12,7 +12,7 @@ import coco_label_map
 ENDPOINT = 'http://localhost:8501/v1/models/default:predict'
 TMP_FILE = "./tmp.mov"
 
-FRAME_BATCH=30
+FRAME_BATCH=1
 
 logging.basicConfig(
     level=logging.INFO,
@@ -69,8 +69,11 @@ def process_video_from_file(file_path):
     batch = []
     predictions = []
 
+    log.info('frame batch %d', FRAME_BATCH)
+
     for i in range(count):
         log.info('range: %d', i)
+        log.info('batch size: %d', len(batch))
         if len(batch) == FRAME_BATCH or i == (count - 1):
             log.info('start batch process')
 
