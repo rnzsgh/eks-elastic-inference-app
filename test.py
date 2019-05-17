@@ -21,12 +21,8 @@ logging.basicConfig(
 log = logging.getLogger()
 
 def get_prediction_from_image_array(image_array):
-    log.info('get_prediction_from_image_array')
-
     payload = {"instances": [image_array.tolist()]}
-    log.info('get_prediction_from_image_array  before endpoint call')
     res = requests.post(ENDPOINT, json=payload)
-    log.info('get_prediction_from_image_array  after endpoint call')
     return res.json()['predictions'][0]
 
 def get_classes_with_scores(predictions):
@@ -38,24 +34,15 @@ def get_classes_with_scores(predictions):
 
 def process_video_from_file(file_path, instance_id):
 
-    log.info('Start processing video - instance: %s', instance_id)
-
     frames = []
     vidcap = cv2.VideoCapture(file_path)
     success, frame = vidcap.read()
     success = True
 
-    log.info('processing video first loop - instance: %s', instance_id)
-    count = 0
     while success:
-        if count % 100 == 0:
-            log.info('frame: %d', count)
-
-        count += 1
         frames.append(frame)
         success, frame = vidcap.read()
 
-    log.info('processing video second loop - instance: %s', instance_id)
     pred_list = []
     for frame in frames:
         preds = get_prediction_from_image_array(frame)
@@ -105,9 +92,6 @@ def main():
 
                 message.change_visibility(VisibilityTimeout=600)
                 log.info('Message visibility updated - instance: %s', instance_id)
-
-                log.info('before message body print')
-                log.info('%s', message.body)
 
                 # Process the message
                 doc = json.loads(message.body)
