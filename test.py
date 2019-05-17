@@ -80,7 +80,7 @@ def main():
     log.info('Initialized - instance: %s', instance_id)
 
     while True:
-        for message in task_queue.receive_messages(WaitTimeSeconds=20):
+        for message in task_queue.receive_messages(WaitTimeSeconds=10):
             try:
                 log.info('Message received - instance: %s', instance_id)
 
