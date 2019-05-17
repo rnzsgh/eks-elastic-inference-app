@@ -50,9 +50,7 @@ def get_classes_with_scores(predictions):
 
     return vals
 
-def prepare_frames(q, ):
-
-
+#def prepare_frames(q, ):
 
 def process_video_from_file(file_path):
 
