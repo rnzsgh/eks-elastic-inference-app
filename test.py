@@ -22,9 +22,9 @@ logging.basicConfig(
 
 log = logging.getLogger()
 
-def get_predictions_from_image_array(images):
+def get_predictions_from_image_array(batch):
     log.info('get_predictions_from_image_array')
-    res = requests.post(ENDPOINT, json={ 'instances': images })
+    res = requests.post(ENDPOINT, json={ 'instances': batch })
     return res.json()['predictions']
 
 def get_classes_with_scores(predictions):
@@ -70,8 +70,10 @@ def process_video_from_file(file_path):
     predictions = []
 
     for i in range(count):
+        log.info('range: %d', i)
         if len(batch) == FRAME_BATCH or i == (count - 1):
             log.info('start batch process')
+
             for v in get_classes_with_scores(get_predictions_from_image_array(batch)):
                 log.info('batch process result')
                 predictions.append(str(v))
