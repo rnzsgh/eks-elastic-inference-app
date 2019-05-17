@@ -1,6 +1,8 @@
 import boto3
 import os
 import sys
+import cv2
+import numpy
 import requests
 import json
 
