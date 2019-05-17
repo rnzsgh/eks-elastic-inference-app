@@ -39,16 +39,25 @@ def get_classes_with_scores(predictions):
 
     return vals
 
-def process_video_from_file(file_path, instance_id):
+def process_video_from_file(file_path):
+
+    log.info('process_video_from_file')
 
     frames = []
     vidcap = cv2.VideoCapture(file_path)
     success, frame = vidcap.read()
     success = True
 
+    log.info('start frame extraction')
+
     while success:
         frames.append(frame)
         success, frame = vidcap.read()
+
+    log.info('end frame extraction')
+
+    frames = []
+    vidcap = cv2.VideoCapture(file_path)
 
     count = len(frames)
     batch = []
@@ -57,17 +66,20 @@ def process_video_from_file(file_path, instance_id):
     for i in range(count):
 
         if len(batch) == FRAME_BATCH or i == (count - 1):
+            log.info('start batch process')
             for v in get_classes_with_scores(get_predictions_from_image_array(batch)):
+                log.info('batch process result')
                 predictions.append(str(v))
                 predictions.append('\n')
             batch.clear()
         else:
+            log.info('appending frame to batch')
             batch.append(frames[i].tolist())
-
-    return predictions
 
     vidcap.release()
     cv2.destroyAllWindows()
+
+    return predictions
 
 def main():
 
@@ -118,7 +130,7 @@ def main():
                 log.info('File is downloaded - instance: %s', instance_id)
 
                 log.info('Starting predictions - instance: %s', instance_id)
-                predictions_for_frames = process_video_from_file(TMP_FILE, instance_id)
+                predictions_for_frames = process_video_from_file(TMP_FILE)
                 log.info('Predictions completed - instance: %s', instance_id)
 
                 task_completed_queue.send_message(MessageBody=''.join(e for e in predictions_for_frames))
