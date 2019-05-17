@@ -91,11 +91,12 @@ def main():
                 message.change_visibility(VisibilityTimeout=600)
                 log.info('Message visibility updated - instance: %s', instance_id)
 
-                log.info(message.body)
+                log.info('before message body print')
+                log.info('%s', message.body)
 
                 # Process the message
                 doc = json.loads(message.body)
-                print('Message body is loaded - instance: ' + instance_id)
+                log.info('Message body is loaded - instance: %s', instance_id)
 
                 s3.download_file(doc['bucket'], doc['object'], TMP_FILE)
                 log.info('File is downloaded - instance: %s', instance_id)
