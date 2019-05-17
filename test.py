@@ -23,18 +23,25 @@ logging.basicConfig(
 log = logging.getLogger()
 
 def get_predictions_from_image_array(images):
+    log.info('get_predictions_from_image_array')
     res = requests.post(ENDPOINT, json={ 'instances': images })
     return res.json()['predictions']
 
 def get_classes_with_scores(predictions):
+    log.info('get_classes_with_scores')
 
     vals = []
 
-    for prediction in predictions:
-        num_detections = int(prediction['num_detections'])
-        detected_classes = prediction['detection_classes'][:num_detections]
+    for p in predictions:
+        log.info('prediction')
+        num_detections = int(p['num_detections'])
+        log.info('num_detections')
+        detected_classes = p['detection_classes'][:num_detections]
+        log.info('detection_classes')
         detected_classes =[coco_label_map.label_map[int(x)] for x in detected_classes]
-        detection_scores = prediction['detection_scores'][:num_detections]
+        log.info('get label')
+        detection_scores = p['detection_scores'][:num_detections]
+        log.info('detection_scores')
         vals.append(list(zip(detected_classes, detection_scores)))
 
     return vals
@@ -56,15 +63,13 @@ def process_video_from_file(file_path):
 
     log.info('end frame extraction')
 
-    frames = []
-    vidcap = cv2.VideoCapture(file_path)
-
     count = len(frames)
+
+    log.info('frame count: %d', count)
     batch = []
     predictions = []
 
     for i in range(count):
-
         if len(batch) == FRAME_BATCH or i == (count - 1):
             log.info('start batch process')
             for v in get_classes_with_scores(get_predictions_from_image_array(batch)):
@@ -73,7 +78,6 @@ def process_video_from_file(file_path):
                 predictions.append('\n')
             batch.clear()
         else:
-            log.info('appending frame to batch')
             batch.append(frames[i].tolist())
 
     vidcap.release()
