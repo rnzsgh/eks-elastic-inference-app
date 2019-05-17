@@ -1,0 +1,11 @@
+
+*.swp
+*.pyc
+*.yml
+*.sh
+*.md
+.gitignore
+.git
+Dockerfile
+Dockerfile_tf_serving
+.DS_Store
