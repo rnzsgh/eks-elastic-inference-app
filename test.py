@@ -82,10 +82,13 @@ def main():
 
                 # Process the message
                 doc = json.loads(message.body)
+                print('Message body is loaded - instance: ' + instance_id)
 
-                s3.download_file(doc['bucket'], dock['object'], TMP_FILE)
+                s3.download_file(doc['bucket'], doc['object'], TMP_FILE)
+                print('File is downloaded - instance: ' + instance_id)
 
                 predictions_for_frames = process_video_from_file(TMP_FILE)
+                print('Predictions completed - instance: ' + instance_id)
 
                 task_completed_queue.send_message(MessageBody=''.join(e for e in predictions_for_frames))
                 print('Task completed msg sent - instance: ' + instance_id)
@@ -102,7 +105,7 @@ def main():
                     os.remove(TMP_FILE)
 
             except:
-                print('Problem processing message', sys.exc_info()[0])
+                print('Problem processing message: ', sys.exc_info()[0])
 
 if __name__ == '__main__':
     main()
