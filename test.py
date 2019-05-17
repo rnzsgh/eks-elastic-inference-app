@@ -46,8 +46,11 @@ def process_video_from_file(file_path, instance_id):
     success = True
 
     log.info('processing video first loop - instance: %s', instance_id)
+    count = 0
     while success:
-      log.info('frame')
+        if count % 100 == 0:
+            log.info('frame: %d', count)
+        count += 1
       frames.append(frame)
       success, frame = vidcap.read()
 
