@@ -12,6 +12,8 @@ import coco_label_map
 ENDPOINT = 'http://localhost:8501/v1/models/default:predict'
 TMP_FILE = "./tmp.mov"
 
+FRAME_BATCH=50
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s',
@@ -20,17 +22,22 @@ logging.basicConfig(
 
 log = logging.getLogger()
 
-def get_prediction_from_image_array(image_array):
-    payload = {"instances": [image_array.tolist()]}
-    res = requests.post(ENDPOINT, json=payload)
-    return res.json()['predictions'][0]
+def get_predictions_from_image_array(images):
+    res = requests.post(ENDPOINT, json={ 'instances': images })
+    return res.json()['predictions']
 
 def get_classes_with_scores(predictions):
-    num_detections = int(predictions['num_detections'])
-    detected_classes = predictions['detection_classes'][:num_detections]
-    detected_classes =[coco_label_map.label_map[int(x)] for x in detected_classes]
-    detection_scores = predictions['detection_scores'][:num_detections]
-    return list(zip(detected_classes, detection_scores))
+
+    vals = []
+
+    for prediction in predictions:
+        num_detections = int(prediction['num_detections'])
+        detected_classes = prediction['detection_classes'][:num_detections]
+        detected_classes =[coco_label_map.label_map[int(x)] for x in detected_classes]
+        detection_scores = prediction['detection_scores'][:num_detections]
+        vals.append(list(zip(detected_classes, detection_scores)))
+
+    return vals
 
 def process_video_from_file(file_path, instance_id):
 
@@ -43,14 +50,24 @@ def process_video_from_file(file_path, instance_id):
         frames.append(frame)
         success, frame = vidcap.read()
 
-    pred_list = []
-    for frame in frames:
-        preds = get_prediction_from_image_array(frame)
-        classes_with_scores = get_classes_with_scores(preds)
-        pred_list.append(str(classes_with_scores))
-        pred_list.append('\n')
+    count = len(frames)
+    batch = []
+    predictions = []
 
-    return pred_list
+    for i in range(count):
+
+        if len(batch) == FRAME_BATCH or i == (count - 1):
+            for v in get_classes_with_scores(get_predictions_from_image_array(batch)):
+                predictions.append(str(v))
+                predictions.append('\n')
+            batch.clear()
+        else:
+            batch.append(frames[i].tolist())
+
+    return predictions
+
+    vidcap.release()
+    cv2.destroyAllWindows()
 
 def main():
 
