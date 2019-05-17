@@ -10,7 +10,7 @@ import logging
 import coco_label_map
 
 ENDPOINT = 'http://localhost:8501/v1/models/default:predict'
-TMP_FILE = '/tmp.mov'
+TMP_FILE = "./tmp.mov"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -47,6 +47,7 @@ def process_video_from_file(file_path, instance_id):
 
     log.info('processing video first loop - instance: %s', instance_id)
     while success:
+      log.info('frame')
       frames.append(frame)
       success, frame = vidcap.read()
 
