@@ -57,6 +57,7 @@ def prepare(prepare_queue, inference_queue):
 def add_to_prepare(prepare_queue, frames):
     for f in frames:
         prepare_queue.put(f)
+    frames.clear()
 
 def process_video_from_file(file_path, prepare_queue, inference_queue):
 
@@ -131,7 +132,7 @@ def main():
 
     log.info('Initialized - instance: %s', instance_id)
 
-    prepare_queue = queue.Queue(maxsize=FRAME_BATCH)
+    prepare_queue = queue.Queue()
     inference_queue = queue.Queue(maxsize=FRAME_BATCH)
 
     prepare_worker = threading.Thread(target=prepare, args=(prepare_queue, inference_queue,))
