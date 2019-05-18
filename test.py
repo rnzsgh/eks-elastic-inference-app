@@ -54,25 +54,31 @@ def prepare(prepare_queue, inference_queue):
     while True:
         inference_queue.put(prepare_queue.get().tolist())
 
+def add_to_prepare(prepare_queue, frames):
+    for f in frames:
+        prepare_queue.put(f)
+
 def process_video_from_file(file_path, prepare_queue, inference_queue):
 
     log.info('process_video_from_file')
 
-    # frames = []
+    frames = []
     vidcap = cv2.VideoCapture(file_path)
     success, frame = vidcap.read()
     success = True
 
     log.info('start frame extraction')
-    count = 0
 
     while success:
-        #frames.append(frame)
-        count += 1
-        prepare_queue.put(frame)
+        frames.append(frame)
         success, frame = vidcap.read()
 
     log.info('end frame extraction')
+
+    count = len(frames)
+
+    add_worker = threading.Thread(target=add_to_prepare, args=(prepare_queue, frames,))
+    add_worker.start()
 
     log.info('frame count: %d', count)
     batch = []
@@ -81,7 +87,8 @@ def process_video_from_file(file_path, prepare_queue, inference_queue):
     log.info('frame batch %d', FRAME_BATCH)
 
     for i in range(count):
-        frame = inference_queue.get()
+        batch.append(inference_queue.get())
+
         log.info('range: %d - batch: %d', i, len(batch))
         if len(batch) == FRAME_BATCH or i == (count - 1):
             log.info('start batch process')
@@ -91,9 +98,6 @@ def process_video_from_file(file_path, prepare_queue, inference_queue):
                 predictions.append(str(v))
                 predictions.append('\n')
             batch.clear()
-        else:
-            #batch.append(frames[i].tolist())
-            batch.append(frame)
 
     vidcap.release()
     cv2.destroyAllWindows()
@@ -127,8 +131,8 @@ def main():
 
     log.info('Initialized - instance: %s', instance_id)
 
-    prepare_queue = queue.Queue()
-    inference_queue = queue.Queue()
+    prepare_queue = queue.Queue(maxsize=FRAME_BATCH)
+    inference_queue = queue.Queue(maxsize=FRAME_BATCH)
 
     prepare_worker = threading.Thread(target=prepare, args=(prepare_queue, inference_queue,))
     prepare_worker.start()
@@ -157,6 +161,8 @@ def main():
                 log.info('Starting predictions - instance: %s', instance_id)
                 predictions_for_frames = process_video_from_file(TMP_FILE, prepare_queue, inference_queue)
                 log.info('Predictions completed - instance: %s', instance_id)
+
+                log.info(''.join(e for e in predictions_for_frames))
 
                 task_completed_queue.send_message(MessageBody=''.join(e for e in predictions_for_frames))
                 log.info('Task completed msg sent - instance: %s', instance_id)
