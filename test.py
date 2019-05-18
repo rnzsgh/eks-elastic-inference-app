@@ -14,7 +14,7 @@ import coco_label_map
 ENDPOINT = 'http://localhost:8501/v1/models/default:predict'
 TMP_FILE = "./tmp.mov"
 
-FRAME_BATCH=15
+FRAME_BATCH=10
 
 logging.basicConfig(
     level=logging.INFO,
@@ -23,8 +23,6 @@ logging.basicConfig(
 )
 
 log = logging.getLogger()
-
-
 
 def get_predictions_from_image_array(batch):
     log.info('get_predictions_from_image_array')
