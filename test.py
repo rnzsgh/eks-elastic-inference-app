@@ -14,7 +14,7 @@ import coco_label_map
 ENDPOINT = 'http://localhost:8501/v1/models/default:predict'
 TMP_FILE = "./tmp.mov"
 
-FRAME_BATCH=20
+FRAME_BATCH=5
 
 logging.basicConfig(
     level=logging.INFO,
