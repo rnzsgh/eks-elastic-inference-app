@@ -14,7 +14,7 @@ import coco_label_map
 ENDPOINT = 'http://localhost:8501/v1/models/default:predict'
 TMP_FILE = "./tmp.mov"
 
-FRAME_BATCH=10
+FRAME_BATCH=20
 
 logging.basicConfig(
     level=logging.INFO,
@@ -25,25 +25,16 @@ logging.basicConfig(
 log = logging.getLogger()
 
 def get_predictions_from_image_array(batch):
-    log.info('get_predictions_from_image_array')
     res = requests.post(ENDPOINT, json={ 'instances': batch })
     return res.json()['predictions']
 
 def get_classes_with_scores(predictions):
-    log.info('get_classes_with_scores')
-
     vals = []
-
     for p in predictions:
-        log.info('prediction')
         num_detections = int(p['num_detections'])
-        log.info('num_detections')
         detected_classes = p['detection_classes'][:num_detections]
-        log.info('detection_classes')
         detected_classes =[coco_label_map.label_map[int(x)] for x in detected_classes]
-        log.info('get label')
         detection_scores = p['detection_scores'][:num_detections]
-        log.info('detection_scores')
         vals.append(list(zip(detected_classes, detection_scores)))
 
     return vals
@@ -88,18 +79,15 @@ def process_video_from_file(file_path, prepare_queue, inference_queue):
     for i in range(count):
         batch.append(inference_queue.get())
 
-        log.info('range: %d - batch: %d', i, len(batch))
         if len(batch) == FRAME_BATCH or i == (count - 1):
-            log.info('start batch process')
-
+            log.info('range: %d - batch: %d', i, len(batch))
             for v in get_classes_with_scores(get_predictions_from_image_array(batch)):
-                log.info('batch process result')
                 predictions.append(str(v))
                 predictions.append('\n')
             batch.clear()
 
     vidcap.release()
-    cv2.destroyAllWindows()
+    #cv2.destroyAllWindows()
 
     return predictions
 
