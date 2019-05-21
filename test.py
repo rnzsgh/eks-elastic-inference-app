@@ -16,6 +16,8 @@ TMP_FILE = "./tmp.mov"
 
 FRAME_BATCH=5
 
+FRAME_MAX=20
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s',
@@ -59,9 +61,13 @@ def process_video_from_file(file_path, prepare_queue, inference_queue):
 
     log.info('start frame extraction')
 
+    max_frame = 0
     while success:
         frames.append(frame)
         success, frame = vidcap.read()
+        max_frame += 1
+        if max_frame == FRAME_MAX:
+            break
 
     log.info('end frame extraction')
 
